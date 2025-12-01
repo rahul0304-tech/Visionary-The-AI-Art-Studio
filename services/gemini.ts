@@ -4,7 +4,9 @@ import { DirectorPlan } from "../types";
 // Helper to get client with current key
 const getClient = () => {
   // The API key is injected into process.env.API_KEY after selection via window.aistudio
-  return new GoogleGenAI({ apiKey: process.env.API_KEY });
+  // We add a safety check for 'process' to avoid ReferenceError in vanilla browser environments
+  const apiKey = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : '';
+  return new GoogleGenAI({ apiKey: apiKey || '' });
 };
 
 export const checkApiKey = async (): Promise<boolean> => {
@@ -23,6 +25,14 @@ export const requestApiKey = async (): Promise<boolean> => {
   }
   return false;
 };
+
+// Force a reset of the key (if supported by environment, otherwise just clears local state logic)
+export const clearApiKey = async (): Promise<void> => {
+   // Since we can't programmatically un-set the key in the window.aistudio environment directly 
+   // without reloading usually, we primarily use this to trigger the UI state change.
+   // In a real app, this might clear local storage.
+   return;
+}
 
 export const directorAgent = async (brief: string): Promise<DirectorPlan> => {
   const ai = getClient();
