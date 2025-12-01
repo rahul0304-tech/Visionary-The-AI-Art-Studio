@@ -1,0 +1,5 @@
+{
+  "name": "Visionary: Agentic Creative Studio",
+  "description": "An autonomous multi-agent pipeline for generative media using Gemini, Imagen, and Veo.",
+  "requestFramePermissions": []
+}
