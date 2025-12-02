@@ -1,28 +1,22 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { DirectorPlan } from "../types";
 
-let runtimeKey = '';
+const CACHE_KEY = 'gemini-api-key';
 
 export const setApiKey = (key: string) => {
-  runtimeKey = key;
+  localStorage.setItem(CACHE_KEY, key);
 };
 
 // Helper to get client with current key
 const getClient = () => {
-  // Priority: Manually set runtime key -> process.env.API_KEY -> empty
-  const envKey = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : '';
-  const finalKey = runtimeKey || envKey || '';
+  const cachedKey = localStorage.getItem(CACHE_KEY);
+  const envKey = import.meta.env.VITE_GEMINI_API_KEY;
+  const finalKey = cachedKey || envKey || '';
   return new GoogleGenAI({ apiKey: finalKey });
 };
 
 export const checkApiKey = async (): Promise<boolean> => {
-  if (runtimeKey) return true;
-  
-  const win = window as any;
-  if (win.aistudio && win.aistudio.hasSelectedApiKey) {
-    return await win.aistudio.hasSelectedApiKey();
-  }
-  return false;
+  return !!localStorage.getItem(CACHE_KEY);
 };
 
 export const requestApiKey = async (): Promise<boolean> => {
@@ -36,9 +30,8 @@ export const requestApiKey = async (): Promise<boolean> => {
 
 // Force a reset of the key
 export const clearApiKey = async (): Promise<void> => {
-   runtimeKey = '';
-   return;
-}
+  localStorage.removeItem(CACHE_KEY);
+};
 
 export const directorAgent = async (brief: string): Promise<DirectorPlan> => {
   const ai = getClient();
