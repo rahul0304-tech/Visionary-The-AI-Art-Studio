@@ -103,7 +103,6 @@ export const motionDeptAgent = async (imageBytes: string, prompt: string): Promi
     },
     config: {
       numberOfVideos: 1,
-      resolution: '720p', // Fast preview
       aspectRatio: '16:9'
     }
   });
